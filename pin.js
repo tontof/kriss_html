@@ -144,6 +144,193 @@ function unSelectElement(elt) {
     }
 }
 
+
+//http://www.overset.com/2008/09/01/javascript-natural-sort-algorithm/
+function naturalSort (a, b) {
+    var re = /(^-?[0-9]+(\.?[0-9]*)[df]?e?[0-9]?$|^0x[0-9a-f]+$|[0-9]+)/gi,
+        sre = /(^[ ]*|[ ]*$)/g,
+        dre = /(^([\w ]+,?[\w ]+)?[\w ]+,?[\w ]+\d+:\d+(:\d+)?[\w ]?|^\d{1,4}[\/\-]\d{1,4}[\/\-]\d{1,4}|^\w+, \w+ \d+, \d{4})/,
+        hre = /^0x[0-9a-f]+$/i,
+        ore = /^0/,
+        i = function(s) { return naturalSort.insensitive && (''+s).toLowerCase() || ''+s },
+        // convert all to strings strip whitespace
+        x = i(a).replace(sre, '') || '',
+        y = i(b).replace(sre, '') || '',
+        // chunk/tokenize
+        xN = x.replace(re, '\0$1\0').replace(/\0$/,'').replace(/^\0/,'').split('\0'),
+        yN = y.replace(re, '\0$1\0').replace(/\0$/,'').replace(/^\0/,'').split('\0'),
+        // numeric, hex or date detection
+        xD = parseInt(x.match(hre)) || (xN.length != 1 && x.match(dre) && Date.parse(x)),
+        yD = parseInt(y.match(hre)) || xD && y.match(dre) && Date.parse(y) || null,
+        oFxNcL, oFyNcL;
+    // first try and sort Hex codes or Dates
+    if (yD)
+        if ( xD < yD ) return -1;
+        else if ( xD > yD ) return 1;
+    // natural sorting through split numeric strings and default strings
+    for(var cLoc=0, numS=Math.max(xN.length, yN.length); cLoc < numS; cLoc++) {
+        // find floats not starting with '0', string or 0 if not defined (Clint Priest)
+        oFxNcL = !(xN[cLoc] || '').match(ore) && parseFloat(xN[cLoc]) || xN[cLoc] || 0;
+        oFyNcL = !(yN[cLoc] || '').match(ore) && parseFloat(yN[cLoc]) || yN[cLoc] || 0;
+        // handle numeric vs string comparison - number < string - (Kyle Adams)
+        if (isNaN(oFxNcL) !== isNaN(oFyNcL)) { return (isNaN(oFxNcL)) ? 1 : -1; }
+        // rely on string comparison if different types - i.e. '02' < 2 != '02' < '2'
+        else if (typeof oFxNcL !== typeof oFyNcL) {
+            oFxNcL += '';
+            oFyNcL += '';
+        }
+        if (oFxNcL < oFyNcL) return -1;
+        if (oFxNcL > oFyNcL) return 1;
+    }
+    return 0;
+}
+
+function putInOrder() {
+    
+    var elt = null;
+    var eltTH = null;
+    var parentsFirst = [];
+    var parentsSecond = [];
+    var whichChild = [];
+    var commonParent = null;
+    var i = 0;
+    var j = 0;
+    var len = 0;
+    var iCP = 0;
+    var childList = [];
+    var incorrectChildList = [];
+    var elementList = [];
+    var skipTH = false;
+    
+    if (sel.length !=2){
+        w.alert("select only 2 elements.");
+    }else{
+        elt = sel[0];
+        while(elt){//on garde les parents du premier élément cliqué
+            parentsFirst.push(elt);
+            if(elt.parentNode){//s'il a un parent, on cherche c'est le combientieme enfant
+                childList = elt.parentNode.childNodes;//on recup freres 
+                i = 0;
+                while ((i < childList.length)){//on parcourt freres
+                    if (childList.item(i)==elt){
+                        whichChild.push(i);//l'element est le ieme enfant de son parent
+                    }
+                    i = i + 1;
+                }
+            }
+            elt = elt.parentNode;
+        }
+        
+        len = parentsFirst.length;
+        elt = sel[1];
+
+        while(elt){//on garde les parents du second élément
+            parentsSecond.push(elt);
+            elt = elt.parentNode;
+        }
+        if (len !=parentsSecond.length){
+            console.log("Les éléments n'ont pas la même profondeur.");
+        }else{
+            //on cherche l'ancêtre commun
+            if (parentsFirst[len - 1] == parentsSecond[len - 1]){ //s'il existe, au pire, c'est le premier
+                i = len - 1;
+                while ((commonParent == null)&&(i>=0)){
+                    if (parentsFirst[i] != parentsSecond[i]){
+                        commonParent = parentsFirst[i + 1];
+                        iCP = i + 1;
+                        if (commonParent.tagName =="TABLE" || commonParent.tagName =="TBODY"){
+                            skipTH = true;
+                        }
+                    }
+                    i = i - 1;
+                }
+            }else{
+                console.log("differents");
+            }
+            if (commonParent){
+                //ils ont un parent commun, on vérifie que c'est le même type de descendance
+                if (iCP==0){
+                    //on fait rien
+                    console.log("on a cliqué sur le mm élément...");
+                }else{
+                    if (iCP==1){
+                        console.log("les éléments sont frères");
+                    }
+                    for (i = iCP - 2; i >= 0; i--){// - 1  car le premier correspond à la bifurcation de la descendance
+                        elt = parentsSecond[i + 1];
+                        try{
+                            elt = elt.childNodes[whichChild[i]];
+                            if (elt != parentsSecond[i]){
+                                console.log("nok pour le parent " + i +"("+iCP+")");
+                            }
+                        }
+                        catch(e){
+                            console.log("err: pas le même niveau entre les deux éléments. " +e);
+                        }
+                    }
+                    //les vérifs nécessaires sont faites (?), on récupère tous les enfants directs de l'ancêtre commun
+                    childList = commonParent.childNodes;
+                    
+                    incorrectChildList = [];
+                    for (i = 0; i < childList.length; i++){//pour tous les fils de l'ancêtre commun
+                        elt = childList.item(i);
+                        if (elt.nodeType !== Node.TEXT_NODE){//s'il a un bon type de noeud
+                            if(iCP>1){
+                                for (j = iCP-2; j >= 0; j--){
+                                    try{
+                                        elt = elt.childNodes[whichChild[j]];
+                                        if (skipTH && elt.tagName == "TH"){
+                                            elt = null;
+                                            eltTH = true;
+                                        }
+                                    }
+                                    catch(e){
+                                        console.log("err : pas la mm hierarchie pour tous les elements, ou element TH")
+                                    }
+                                }
+                            }
+                            if (elt){
+                                elementList.push([elt.textContent, childList.item(i)]);
+                            }else{
+                                if (!eltTH){
+                                    incorrectChildList.push(childList.item(i));
+                                }
+                            }
+                        }
+                    }
+                    //on trie suivant les éléments cliqués
+                    //on peut faire attention au fait que le premier élément est < ou > au deuxième (pb si sont =)
+                    // si contient nombre 1<10<2<22<3<...
+                    elementList.sort(naturalSort);
+                    if(naturalSort(parentsFirst[0].textContent,parentsSecond[0].textContent)>0){
+                        elementList.reverse();
+                    }
+                    //on supprime les enfants directs, et on les ajoute dans le bon ordre
+                    //ceux que l'on trie
+                    for (i = 0; i < elementList.length; i++){
+                        removeElement(elementList[i][1]);
+                    }
+                    //ceux qui iront à la fin
+                    for (i = 0; i < incorrectChildList.length; i++){
+                        removeElement(incorrectChildList[i]);
+                    }
+                    //les triés
+                    for (i = 0; i < elementList.length; i++){
+                        commonParent.appendChild(elementList[i][1]);
+                    }          
+                    //les malformés
+                    for (i = 0; i < incorrectChildList.length; i++){
+                        commonParent.appendChild(incorrectChildList[i]);
+                    }
+                }//endif icp==0
+
+            }//endif commonParent
+        }//endif len ==parentsSecond.length
+    }//endif sel.length !=2
+    deselectSelected();
+}
+
+
 function convertImageUrlIntoBase64(url) {
     var img, canvas, context;
 
@@ -979,9 +1166,8 @@ function initPin() {
                case 79: /* o = on/off */
                onOff();
                break;
-               case 80: /* p = print */
-               exitPin();
-               w.print();
+               case 80: /* p = put in order */
+               putInOrder();
                break;
                case 81: /* q = quit */
                exitPin();
