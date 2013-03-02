@@ -186,7 +186,7 @@ function naturalSort (a, b) {
 }
 
 function putInOrder() {
-    
+
     var elt = null;
     var eltTH = null;
     var parentsFirst = [];
@@ -201,7 +201,7 @@ function putInOrder() {
     var incorrectChildList = [];
     var elementList = [];
     var skipTH = false;
-    
+
     if (sel.length !=2){
         w.alert("select only 2 elements.");
     }else{
@@ -209,7 +209,7 @@ function putInOrder() {
         while(elt){//on garde les parents du premier élément cliqué
             parentsFirst.push(elt);
             if(elt.parentNode){//s'il a un parent, on cherche c'est le combientieme enfant
-                childList = elt.parentNode.childNodes;//on recup freres 
+                childList = elt.parentNode.childNodes;//on recup freres
                 i = 0;
                 while ((i < childList.length)){//on parcourt freres
                     if (childList.item(i)==elt){
@@ -220,7 +220,7 @@ function putInOrder() {
             }
             elt = elt.parentNode;
         }
-        
+
         len = parentsFirst.length;
         elt = sel[1];
 
@@ -270,7 +270,7 @@ function putInOrder() {
                     }
                     //les vérifs nécessaires sont faites (?), on récupère tous les enfants directs de l'ancêtre commun
                     childList = commonParent.childNodes;
-                    
+
                     incorrectChildList = [];
                     for (i = 0; i < childList.length; i++){//pour tous les fils de l'ancêtre commun
                         elt = childList.item(i);
@@ -317,7 +317,7 @@ function putInOrder() {
                     //les triés
                     for (i = 0; i < elementList.length; i++){
                         commonParent.appendChild(elementList[i][1]);
-                    }          
+                    }
                     //les malformés
                     for (i = 0; i < incorrectChildList.length; i++){
                         commonParent.appendChild(incorrectChildList[i]);
@@ -1072,7 +1072,7 @@ function initPin() {
 
     /* menu */
     menu.id = 'kpm';
-    menu.innerHTML = '<span>?</span><div style="text-align:center;text-decoration:underline;"><a href="' + pinUrl + '">KrISS pin bookmarklet</a></div><div style="text-align:center;">by <a href="http://tontof.net">Tontof</a></div><div><em>&uarr;</em>parent node<br><em>&darr;</em>child back node<br><em>&larr;</em>previous sibling<br><em>&rarr;</em>next sibling<br><em>A</em>bout KrISS pin<br><em>B</em>ody tree<br><em>C</em>ss edit last selected<br><em>D</em>eselect all<br><em>E</em>xport<br><em>F</em>irst child selection<br><em>G</em>enerate style for selected<br><em>H</em>tml edit last selected<br><em>I</em>solate selected<br><em>J</em>avascript information<br><em>K</em>eep selected<br><em>L</em>ast child selection<br><em>M</em>argin auto on last selected<br><em>N</em>one display for selected<br><em>O</em>' + (onImagesBase64 === 1 ? 'n' : 'ff') + ' images base64<br><em>P</em>rint<br><em>Q</em>uit KrISS pin<br><em>R</em>emove selected or none<br><em>S</em>tyle information<br><em>T</em>oggle selection current over<br><em>U</em>ndo none display<br><em>V</em>iew code<br><em>W</em>iden last selected<br><em>X</em>ray last selected<br><em>Y</em>our browser<br><em>Z</em>oom last selected<br><div style="text-align:center;text-decoration:underline;">ESC to exit</div><br>';
+    menu.innerHTML = '<span>?</span><div style="text-align:center;text-decoration:underline;"><a href="' + pinUrl + '">KrISS pin bookmarklet</a></div><div style="text-align:center;">by <a href="http://tontof.net">Tontof</a></div><div><em>&uarr;</em>parent node<br><em>&darr;</em>child back node<br><em>&larr;</em>previous sibling<br><em>&rarr;</em>next sibling<br><em>A</em>bout KrISS pin<br><em>B</em>ody tree<br><em>C</em>ss edit last selected<br><em>D</em>eselect all<br><em>E</em>xport<br><em>F</em>irst child selection<br><em>G</em>enerate style for selected<br><em>H</em>tml edit last selected<br><em>I</em>solate selected<br><em>J</em>avascript information<br><em>K</em>eep selected<br><em>L</em>ast child selection<br><em>M</em>argin auto on last selected<br><em>N</em>one display for selected<br><em>O</em>' + (onImagesBase64 === 1 ? 'n' : 'ff') + ' images base64<br><em>P</em>ut in order<br><em>Q</em>uit KrISS pin<br><em>R</em>emove selected or none<br><em>S</em>tyle information<br><em>T</em>oggle selection current over<br><em>U</em>ndo none display<br><em>V</em>iew code<br><em>W</em>iden last selected<br><em>X</em>ray last selected<br><em>Y</em>our browser<br><em>Z</em>oom last selected<br><div style="text-align:center;text-decoration:underline;">ESC to exit</div><br>';
     b.appendChild(menu);
 
     /* set style */
